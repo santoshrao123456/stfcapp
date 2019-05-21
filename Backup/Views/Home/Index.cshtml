@@ -1,0 +1,35 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>jQuery UI Slider - Range slider</title>
+    <link href="~/Jquery/jquery-ui.css" rel="stylesheet" />
+    <script src="~/Jquery/jquery-1.9.1.js"></script>
+    <script src="~/Jquery/jquery-ui.js"></script>
+    <link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">
+    <script>
+        $(function () {
+            $("#slider-range").slider({
+                range: true,
+                min: 0,
+                max: 500,
+                values: [75, 300],
+                slide: function (event, ui) {
+                    $("#amount").val(ui.values[0] + "km" + "-" + ui.values[1] + "km");
+                }
+            });
+
+            $("#amount").val("$" + $("#slider-range").slider("values", 0) +
+                " - $" + $("#slider-range").slider("values", 1));
+        });
+    </script>
+
+</head>
+<body>
+    <p>
+        <label for="amount">Price range:</label>
+        <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;">
+    </p>
+    <div id="slider-range"></div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+
+
+<div class="modal modal-overlay" ui-if="modal2" ui-shared-state="modal2">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close"
+                        ui-turn-off="modal2">
+                    &times;
+                </button>
+                <h4 class="modal-title">Location</h4>
+            </div>
+            <div class="modal-body">
+                <ng-map zoom="8" ng-model="lx.map" map-type-id="ROADMAP"
+                        pan-control="false" style="height:550px;"
+                        zoom-to-include-markers='auto'
+                        center="[40.74, -74.18]">
+                    <custom-marker position="{{p.lat}}, {{p.lng}}" ng-repeat="p in lx.markers">
+                        <div style="padding: 3px !important;    background: #ffffff;    border-radius: 3px;">
+                            {{p.name}}
+
+
+
+                        </div>
+
+                        <img style="transform: rotate({{p.course}}deg);" src="img/marker.png" height="25px;" />
+
+                    </custom-marker>
+
+                </ng-map>
+            </div>
+            <!--<div class="modal-footer">
+                <button ui-turn-off="modal2" class="btn btn-default">Close</button>
+            </div>-->
+        </div>
+    </div>
+</div>

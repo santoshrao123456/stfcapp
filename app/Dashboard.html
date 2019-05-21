@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <div id="chartContainer" style="height: 150px; width: 100%; position: absolute; top: 0px; left: -160px;"></div>
+    <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+
+    <script>
+        window.onload = function () {
+            var appId = getQueryStringValue("appid");
+            var dataPoints = [], chart;
+            CanvasJS.addColorSet("chartColours",
+                [
+                    "#36C115",
+                    "#EDBD3F",
+                    "#D94826",
+                    "#8E8E8E"
+                ]);
+            $.getJSON("https://etreading.tyresoles.net/beaapi/Users/Status/" + appId, function (chartData) {
+                [
+                    dataPoints.push({ label: "Moving", y: chartData.Moving }),
+                    dataPoints.push({ label: "Idling", y: chartData.Idle }),
+                    dataPoints.push({ label: "Parked", y: chartData.InPartking }),
+                    dataPoints.push({ label: "Offline", y: chartData.Offline })
+                ];
+                console.log(chartData);
+                chart = new CanvasJS.Chart("chartContainer",
+                    {
+                        colorSet: "chartColours",
+                        legend: {
+                            horizontalAlign: "right",
+                            verticalAlign: "center",
+                            fontSize: 15
+                        },
+                        data: [{
+                            type: "doughnut",
+                            innerRadius: "40%",
+                            showInLegend: true,
+                            animationEnabled: true,
+                            legendText: "{label}",
+                            indexLabel: "{label}: {y}",
+                            indexLabelFontSize: 15,
+                            indexLabelPlacement: "outside",
+                            indexLabelOrientation: "horizontal",
+                            dataPoints: dataPoints
+                        }]
+                    });
+                chart.render();
+
+                chart = null;
+            });
+            function getQueryStringValue(key) {
+                return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+            }
+
+            setTimeout(function () {
+                window.location.reload(1);
+            }, 10 * 1000);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

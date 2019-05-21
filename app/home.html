@@ -1,0 +1,147 @@
+﻿<style>
+    td { /* removed the border from the table data rows  */
+        text-align: center;
+        width: 40em;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    th { /* removed the border from the table heading row  */
+        text-align: center;
+        padding: 1em;
+        background-color: #34495E; /* added a red background color to the heading cells  */
+        color: white;
+        font-size: 12px;
+    }
+    a {
+        text-align: center;
+        color: white;
+    }
+</style>
+<div class="scrollable">
+    <div class="scrollable-content">
+        <div class="list-group text-center">
+            <div class="list-group-item list-group-item-home">                
+                    <div class="row">
+                        <div class="col-md-5 col-sm-3 col-xs-3" style="text-align:right;"><font size="4"> Last </font></div>
+                        <div class="col-md-1 col-sm-4 col-xs-4" style="text-align:left;">
+                            <select id="nod" class="form-control">
+                                <option value="7">7</option>
+                                <option value="15" selected>15</option>
+                                <option value="30">30</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1 col-sm-2 col-xs-2" style="text-align:left;"><font size="4"> Days </font></div>
+                        <div class="col-md-5 hidden-sm hidden-xs" style="text-align:left;">
+                            <button ng-click="fetchData();" class="btn btn-info" type="button" style="width:100px;">GO</button>
+                        </div>
+                    </div><br />
+                    <div class="row hidden-sm hidden-xs"><center><div class="slider sleep" style="margin:0 10%;width: 80%;" id="slider"></div></center></div>
+					<div class="row hidden-lg hidden-md visible-sm-block visible-xs-block">
+					<div class="col-sm-6 col-xs-6">Red:<input type="number" id="txtMin" class="form-control"  /></div>
+					<div class="col-sm-6 col-xs-6">Green:<input type="number" id="txtMax" class="form-control" /></div>
+					<div class="hidden-md hidden-lg col-sm-12 col-xs-12 block-center" style="text-align:center;"><br/>
+                            <button ng-click="fetchData();" class="btn btn-info" type="button" style="width:100px;">GO</button>
+                    </div>
+					</div>
+					</div>
+                    <div class="row"><div class="col-md-4 col-sm-4 col-xs-4" id="rangeRed"></div><div class="col-md-4 col-sm-4 col-xs-4" id="rangeYellow"></div><div class="col-md-4 col-sm-4 col-xs-4" id="rangeGreen"></div></div>
+                    <div class="btn-group justified nav-tabs">
+                        <a ng-click="lx.summary.red.toggle=!lx.summary.red.toggle" class="btn btn-danger " href="" style="font-size:xx-large">
+                            {{lx.summary.red.count}}
+                        </a>
+                        <a ng-click="lx.summary.yellow.toggle=!lx.summary.yellow.toggle" class="btn btn-warning " href="" style="font-size:xx-large">
+                            {{lx.summary.yellow.count}}
+                        </a>
+                        <a ng-click="lx.summary.green.toggle=!lx.summary.green.toggle" class="btn btn-success " href="" style="font-size:xx-large">
+                            {{lx.summary.green.count}}
+                        </a>
+
+                    </div>
+
+                    <div class="form-group ">
+
+                        <input type="text"
+                               ng-model="lx.searchkey"
+                               class="form-control"
+                               placeholder="Search">
+                    </div>
+                    <div style="overflow-x:auto">
+
+                        <table class="table table-bordered table-hover" style="font-size:xx-small">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a ng-click="orderByField='VehicleNo'; reverseSort = !reverseSort">
+                                            Vehicle## <span ng-show="orderByField == 'VehicleNo'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th>
+                                    <th colspan="2" class="DriverName">
+                                        <a ng-click="orderByField='DriverName'; reverseSort = !reverseSort">
+                                            Driver<span ng-show="orderByField == 'Customer'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th>
+									<th class="vehEnableSTFC CustomerName">
+                                        <a ng-click="orderByField='DriverName'; reverseSort = !reverseSort">
+                                            Customer<span ng-show="orderByField == 'Customer'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th>
+									<th class="vehEnableSTFC BranchAlert">
+                                        <a ng-click="orderByField='DriverName'; reverseSort = !reverseSort">
+                                            Alert<span ng-show="orderByField == 'Customer'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th>
+									<th class="vehEnableSTFC LoanNo">
+                                        <a ng-click="orderByField='DriverName'; reverseSort = !reverseSort">
+                                            Loan #<span ng-show="orderByField == 'Customer'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a ng-click="orderByField='Distance'; reverseSort = !reverseSort">
+                                            Avg Kms<span ng-show="orderByField == 'Customer'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th>
+									<!--th class="vehEnableSTFC CustomerMobile">
+                                        <a ng-click="orderByField='DriverName'; reverseSort = !reverseSort">
+                                            Dial<span ng-show="orderByField == 'Customer'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th-->
+									<th class="vehEnableSTFC Locate">
+                                        <a ng-click="orderByField='DriverName'; reverseSort = !reverseSort">
+                                            Locate<span ng-show="orderByField == 'Customer'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
+                                        </a>
+                                    </th>
+									<th class="vehEnable">
+                                        Notification Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="d in lx.summaryData | filter: lx.searchkey |orderBy:orderByField:reverseSort">
+                                    <td style="text-align:left;">{{d.VehicleNo}}</td>
+                                    <td colspan="2" style="text-align:left;" class="DriverName"><a style="text-decoration:none;color:black;white-space: nowrap" ; href="tel:{{d.DriverPhone}}">{{d.DriverName}}</a></td>
+									<td style="text-align:left;" class="vehEnableSTFC CustomerName"><a class="CustomerMobile" style="color:blue"></a></td>
+									<td style="text-align:left;" class="vehEnableSTFC BranchAlert"><input type="checkbox" class="toggle-one" ></td>									
+									<td style="text-align:left;" class="vehEnableSTFC LoanNo"></td>									
+                                    <td ng-class="d.Class">{{d.Distance}}</td>
+									<!--td style="text-align:left;" class="vehEnableSTFC CustomerMobile"></td-->
+									<td style="text-align:left;" class="vehEnableSTFC Locate"><a style="text-decoration:none;color:black;white-space: nowrap" ; href="tel:{{d.DriverPhone}}"></a></td>
+									<td class="vehEnable"><input type="checkbox" class="toggle-one" checked ></td>
+									<td style="display:none;" class="vehId">{{d.VehicleId}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+</div>
+<div ui-content-for="modals" ui-yield-to="">
+    <div ng-include="'modal1.html'"></div>
+</div>
+
+
+<div ui-content-for="a-modals">
+    <div ng-include="'modal2.html'"></div>
+</div>

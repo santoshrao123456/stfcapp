@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Custom Field Editor</title>
+    <link href="../Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="../Scripts/jquery-1.10.2.min.js"></script>
+    <script src="../Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="row jumbotron center-block">
+        <form>
+            <div class="col-md-12"><label for="selVehicles">Select Vehicle</label><select id="selVehicles" class="form-control" onchange="clickChange()"></select></div>
+            <div class="col-md-12"><label for="txtSpeedLimit">Speeding-Limit</label><input type="text" id="txtSpeedLimit" class="form-control" /></div>
+            <div class="col-md-12"><label for="txtDriverName">Driver-Name</label><input type="text" id="txtDriverName" class="form-control" /></div>
+            <div class="col-md-12"><label for="txtDriverMobile">Driver-Mobile</label><input type="text" id="txtDriverMobile" class="form-control" /></div>
+            <div class="col-md-12"><center><button class="btn btn-primary" type="button" onclick="clickSave()">Save</button></center></div>
+        </form>
+    </div>
+    <script type="text/javascript">
+        var str = location.href.split("="),token;        
+        if (str.length > 1) {
+            appId = str[1];           
+        }
+        $.ajax({
+            url: "https://etreading.tyresoles.net/rest/api/v.1/applications/" + appId + "/tokens", type: "POST", data: '{"username": "Admin", "password": "password@543" }',
+            beforeSend: function (xhr) { xhr.setRequestHeader("Content-Type","application/json"); },
+            success: function (resp) {
+                $.ajax({
+                    url: "https://etreading.tyresoles.net/rest/api/v.1/applications/" + appId + "/users",
+                    type: "GET",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', resp.token); token = resp.token; },
+                    success: function (robj) {
+                        var options = "<option value=''>Select Vehicle</option>";
+                        for (var i = 0; i < robj.length; i++) {
+                            if (robj[i].devices.length > 0) {
+                                options += "<option value='" + robj[i].id + "'>" + robj[i].name + "</option>";
+                            }
+                        }
+                        $("#selVehicles").html(options);
+                    }
+                });
+            }
+        });
+        function clickChange() {
+            $.ajax({
+                url: "https://etreading.tyresoles.net/rest/api/v.1/applications/" + appId + "/users/" + this.event.target.selectedOptions[0].value + "/customfields",
+                type: "GET",
+                beforeSend: function (xhr) { xhr.setRequestHeader('Authorization',token);},
+                success: function (robj) {
+                    $("#txtDriverName").val(""); $("#txtDriverMobile").val(""); $("#txtSpeedLimit").val("");
+                    for (var i = 0; i < robj.length; i++) {
+                        if (robj[i].name == "Driver-Name") {
+                            $("#txtDriverName").val(robj[i].value);
+                        } else if (robj[i].name == "Driver-Mobile") {
+                            $("#txtDriverMobile").val(robj[i].value);
+                        } else if (robj[i].name == "Speeding-Limit") {
+                            $("#txtSpeedLimit").val(robj[i].value);
+                        }
+                    }
+                }
+            });
+        }
+        function clickSave() {
+            var ary = [
+                { name: "Speeding-Limit", value: $("#txtSpeedLimit").val() }, { name: "Driver-Name", value: $("#txtDriverName").val() }, { name: "Driver-Mobile", value: $("#txtDriverMobile").val() }
+            ]
+            var k = 0;
+            for (var i = 0; i < ary.length; i++) {
+                $.ajax({
+                    //https://etreading.tyresoles.net/rest/api/v.1/applications/37/users/467/customfields/Driver-Name
+                    url: "https://etreading.tyresoles.net/rest/api/v.1/applications/" + appId + "/users/" + selVehicles.selectedOptions[0].value + "/customfields/" + ary[i].name,
+                    type: "PUT",
+                    data:'{"name":"'+ary[i].name+'","value":"'+ary[i].value+'"}',
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization', token); xhr.setRequestHeader('Content-Type',"application/json"); },
+                    success: function (robj) {
+                        k++;
+                        if (k===3) {
+                            alert("Data Updated Successfully");
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

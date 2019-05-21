@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Daily Vehicle Status</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>	
+</head>
+<body>
+    <div class="jumbotron">
+<div class="row w-100">
+        <div class="col-md-4">
+            <div class="card border-info mx-sm-1 p-3">                
+                <div class="text-info text-center mt-3"><h4>Total Odometer (Km)</h4></div>
+                <div class="text-info text-center mt-2"><h1 id="TotDistance"></h1></div>
+            </div>
+        </div>
+        <!--div class="col-md-3">
+            <div class="card border-success mx-sm-1 p-3">                
+                <div class="text-success text-center mt-3"><h4>Today`s Distance</h4></div>
+                <div class="text-success text-center mt-2"><h1 id="TodDistance"></h1></div>
+            </div>
+        </div-->
+        <div class="col-md-2">
+            <div class="card border-danger mx-sm-1 p-3">               
+                <div class="text-info text-center mt-3"><h4>Total Idle Vehicles</h4></div>
+                <div class="text-info text-center mt-2"><h1 id="TotIdle"></h1></div>
+            </div>
+        </div>
+		<div class="col-md-2">
+            <div class="card border-info mx-sm-1 p-3">                
+                <div class="text-danger text-center mt-3"><h4>Total Stopped Vehicles</</h4></div>
+                <div class="text-danger text-center mt-2"><h1 id="TotStopped"></h1></div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-success mx-sm-1 p-3">                
+                <div class="text-success text-center mt-3"><h4>Total Moving Vehicles</h4></div>
+                <div class="text-success text-center mt-2"><h1 id="TotMoving"></h1></div>
+            </div>
+        </div>
+        </div>
+     </div>
+</div>
+    <script type="text/javascript">
+	var token="",totalDistanc=0,totalIdle=0,totalStop=0,totalMove=0,idx=0,tv;
+$(document).ready(function()
+{	    
+        var str = location.href.split("=");        
+        if (str.length > 1) {
+            appId = str[1];           
+        }		
+        $.ajax(
+		{
+            url: "https://etreading.tyresoles.net/rest/api/v.1/applications/" + appId + "/tokens", type: "POST", data: '{"username": "apiusers", "password": "apiusers" }',
+            beforeSend: function (xhr) { xhr.setRequestHeader("Content-Type","application/json"); },
+            success: function(resp){
+			token=resp.token;
+                $.ajax({
+                    url: "https://etreading.tyresoles.net/rest/api/v.1/applications/" + appId + "/users",
+                    type: "GET",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('Authorization',token);},
+                    success: function (robj) {					
+					setReading(0,robj);
+					}
+					});
+			}
+		});
+});
+		function setReading(idx,robj){					                        
+         $.ajax({
+                url: "https://etreading.tyresoles.net/rest/api/v.1/applications/" + appId + "/users/" + robj[idx++].id + "/status",
+                type: "GET",
+                beforeSend: function (xhr) { xhr.setRequestHeader('Authorization',token);},
+                success: function (robj2){
+					for(var ip=0;ip<robj2.variables.length;ip++){
+					if(robj2.variables[ip].name==="Ignition"){
+					if(robj2.variables[ip].value==="False"){
+					totalStop++;
+					}
+					}else if(robj2.variables[ip].name==="Speed"){
+					if(parseFloat(robj2.variables[ip].value)>0.5){
+					totalMove++;
+					}else{
+					totalIdle++;
+					}
+					}
+					else if(robj2.variables[ip].name==="_Odometer"){
+					totalDistanc+=parseFloat(robj2.variables[ip].value);
+					}					
+					}	
+						$("#TotMoving").html(totalMove);
+						$("#TotStopped").html(totalStop);
+						$("#TotIdle").html(totalIdle);
+						$("#TotDistance").html(parseInt(totalDistanc));
+						if(idx<robj.length){
+						setReading(idx,robj);
+						}else{
+				totalDistanc=0,totalIdle=0,totalStop=0,totalMove=0,idx=0;
+				if(tv){clearTimeout(tv);}
+				setTimeout(function(){setReading(0,robj);},60*1000);
+						}
+				}
+				});
+				
+        }
+    </script>
+</body>
+</html>
